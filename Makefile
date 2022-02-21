@@ -1,0 +1,1 @@
+ghc --make app/Main.hs -Wall -i src/Errors.hs src/CFGData.hs src/Set.hs -o flp21-fun
