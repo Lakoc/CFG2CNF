@@ -2,18 +2,92 @@
 
 module CFGFuncs where
 
-import CFGData (ContextFreeGrammar (CFG, nonTerminals, rules, startingSymbol, terminals), Rule (Rule, _left, _right), Symbol)
-import Data.Char (isUpper)
+import CFGData (CNFRule (RuleN, _leftN, _rightN), ChomskyNormalForm (CNF, nonTerminalsN, rulesN, startingSymbolN, terminalsN), ContextFreeGrammar (CFG, nonTerminals, rules, startingSymbol, terminals), Rule (Rule, _left, _right), Symbol, Symbols)
+import Data.Bifunctor (Bifunctor (bimap))
+import Data.Char (isLower, isUpper)
 import Errors (CustomError (InvalidCFG))
-import Lib (allUnique)
+import Lib (allUnique, filterEmptySublists, unique)
 
+convertToCNF :: ContextFreeGrammar -> ChomskyNormalForm
+convertToCNF CFG {..} =
+  CNF
+    { terminalsN = terminals,
+      nonTerminalsN = unique (map (: []) nonTerminals ++ filterEmptySublists (snd newRules)),
+      startingSymbolN = startingSymbol,
+      rulesN = fst newRules
+    }
+  where
+    newRules = foldr (\rule acc -> joinTuples acc (convertRuleToCNF rule)) ([], [[]]) rules
 
+-- join lists in tuples
+
+joinTuples :: Bifunctor p => ([a1], [a2]) -> p [a1] [a2] -> p [a1] [a2]
+joinTuples tup1 = bimap (fst tup1 ++) (snd tup1 ++)
+
+-- process single rule conversion
+convertRuleToCNF :: Rule -> ([CNFRule], [Symbols])
+convertRuleToCNF rule@Rule {..}
+  | inCNF rule = ([RuleN {_leftN = [_left], _rightN = _right}], [[]])
+  | twoSymbols _right = processTwoSymbols ruleN
+  | otherwise = processMultipleSymbols ruleN
+  where
+    ruleN = RuleN {_leftN = [_left], _rightN = _right}
+
+-- continueSimplification:: CNFRule -> ([CNFRule], [Symbols])
+-- continueSimplification rule@RuleN{..}
+--   | twoSymbols _rightN = processTwoSymbols rule
+--   | otherwise = processMultipleSymbols rule
+-- -- convertRuleToCNF RuleN {_leftN=tail _right, _rightN= tail (tail _right) }
+
+-- Atleast one
+twoSymbols :: Symbols -> Bool
+twoSymbols _right = length _right == 2
+
+processMultipleSymbols :: CNFRule -> ([CNFRule], [Symbols])
+processMultipleSymbols rule@RuleN {..} =
+  if length _rightN == 2
+    then processTwoSymbols rule
+    else
+      joinTuples
+        ( if isLower (head _rightN)
+            then
+              ( [ RuleN {_leftN = _leftN, _rightN = [head _rightN] ++ "'<" ++ tail _rightN ++ ">"},
+                  RuleN {_leftN = head _rightN : "'", _rightN = [head _rightN]}
+                ],
+                (head _rightN : "'") : ["<" ++ tail _rightN ++ ">"]
+              )
+            else ([RuleN {_leftN = _leftN, _rightN = [head _rightN] ++ "<" ++ tail _rightN ++ ">"}], ["<" ++ tail _rightN ++ ">"])
+        )
+        (processMultipleSymbols RuleN {_leftN = "<" ++ tail _rightN ++ ">", _rightN = tail _rightN})
+
+--Process tw
+processTwoSymbols :: CNFRule -> ([CNFRule], [Symbols])
+processTwoSymbols RuleN {..} =
+  ( RuleN {_leftN = _leftN, _rightN = fst processRules} :
+      [RuleN {_leftN = newNonTerm, _rightN = [head newNonTerm]} | newNonTerm <- filterEmptySublists (snd processRules)],
+    snd processRules
+  )
+  where
+    processRules =
+      foldr (\char acc -> joinTuples (if isLower char then (char : "'", [char : "'"]) else ([char], [])) acc) ([], [[]]) _rightN
+
+-- Check whatever rule is already in CNF
+inCNF :: Rule -> Bool
+inCNF rule = singleTerminal rule || twoNonTerminals rule
+
+-- Single terminal on ther right side - A-> a
+singleTerminal :: Rule -> Bool
+singleTerminal Rule {..} = length _right == 1 && isLower (head _right)
+
+-- Two nonterminals on ther right side - A-> BB
+twoNonTerminals :: Rule -> Bool
+twoNonTerminals Rule {..} = length _right == 2 && all isUpper _right
 
 --
 -- Simplification of the context free grammar
 --
 
--- Recursively generate not simple rules with specified nonTerminal on the left side 
+-- Recursively generate not simple rules with specified nonTerminal on the left side
 generateApplicableRules :: Symbol -> [Rule] -> [Rule]
 generateApplicableRules nonTerminal rules
   | all complexRule nonTerminalOnLeft = nonTerminalOnLeft -- All rules with current nonTerminal are nonSimple
@@ -69,8 +143,6 @@ simplifyCFG :: ContextFreeGrammar -> ContextFreeGrammar
 simplifyCFG CFG {..} = CFG {nonTerminals = nonTerminals, terminals = terminals, startingSymbol = startingSymbol, rules = rules'}
   where
     rules' = generateApplicableRulesAll nonTerminals rules
-
-
 
 --
 -- Validation of the context free grammar

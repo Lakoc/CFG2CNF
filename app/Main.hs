@@ -2,12 +2,13 @@ module Main where
 
 import CFGData (ContextFreeGrammar)
 import CFGParser (parseCFG)
-import CFGFuncs (validateCFG, simplifyCFG)
+import CFGFuncs (validateCFG, simplifyCFG, convertToCNF)
 import Data.List
 import Errors (CustomError (..), codeToNumber)
 import System.Environment (getArgs)
 import System.Exit
 
+-- Program options
 dumpCFG :: ContextFreeGrammar -> IO ()
 dumpCFG cfg = do
   putStr (show cfg)
@@ -16,9 +17,9 @@ removeSimpleRules :: ContextFreeGrammar -> IO ()
 removeSimpleRules cfg = do
     dumpCFG $ simplifyCFG cfg
 
--- dumpCNF :: ContextFreeGrammar -> IO ()
--- dumpCNF bkg = do
---     putStrLn "Dumping cnf."
+dumpCNF :: ContextFreeGrammar -> IO ()
+dumpCNF cfg = do
+    putStr (show $ convertToCNF ( simplifyCFG cfg))
 
 -- Print error message to stdout and exit with non-zero code
 dumpError :: CustomError -> String -> IO ()
@@ -33,7 +34,7 @@ procOptions val = case val of
   Right (arg, input) -> case arg of
     "-i" -> Right (dumpCFG, input)
     "-1" -> Right (removeSimpleRules, input)
-    "-2" -> Right (dumpCFG, input)
+    "-2" -> Right (dumpCNF, input)
     _ -> Left UnknownArgument
 
 -- Checks correct number of program arguments
