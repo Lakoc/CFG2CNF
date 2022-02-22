@@ -2,14 +2,14 @@ module Main where
 
 import CFGData (ContextFreeGrammar)
 import CFGParser (parseCFG)
+import Data.List
 import Errors (CustomError (..), codeToNumber)
-import GHC.IO.Handle (BufferMode (NoBuffering), hSetBuffering)
 import System.Environment (getArgs)
-import System.IO (stdout)
+import System.Exit
 
--- dumpBKG :: ContextFreeGrammar -> IO ()
--- dumpBKG bkg = do
---     putStrLn "Dumping bkg."
+dumpCFG :: ContextFreeGrammar -> IO ()
+dumpCFG cfg = do
+  putStr (show cfg)
 
 -- removeSimpleRules :: ContextFreeGrammar -> IO ()
 -- removeSimpleRules bkg = do
@@ -19,40 +19,42 @@ import System.IO (stdout)
 -- dumpCNF bkg = do
 --     putStrLn "Dumping cnf."
 
--- -- On success print the output
--- printOutput:: IO String -> IO ()
--- printOutput output = do
---     val <- output
---     putStrLn val
+-- Print error message to stdout and exit with non-zero code
+dumpError :: CustomError -> String -> IO ()
+dumpError err message = do
+  putStrLn ("An Error has occured!\nError code: " ++ show (codeToNumber err) ++ "\nError message: " ++ show err ++ message)
+  exitWith (ExitFailure (codeToNumber err))
 
-parseInputIO :: IO String -> ContextFreeGrammar
-parseInputIO = parseCFG
-
--- Process program runtime option
-procOptions :: String -> IO String -> Either CustomError ContextFreeGrammar
-procOptions option input = case option of
-  "-i" -> Right $parseCFG input
-  "-1" -> Right $parseCFG input
-  "-2" -> Right $parseCFG input
-  _ -> Left UnknownArgument
+-- Check program option
+procOptions :: Either CustomError (String, IO String) -> Either CustomError (ContextFreeGrammar -> IO (), IO String)
+procOptions val = case val of
+  Left err -> Left err
+  Right (arg, input) -> case arg of
+    "-i" -> Right (dumpCFG, input)
+    "-1" -> Right (dumpCFG, input)
+    "-2" -> Right (dumpCFG, input)
+    _ -> Left UnknownArgument
 
 -- Checks correct number of program arguments
-procArgs :: [String] -> Either CustomError ContextFreeGrammar
+procArgs :: [String] -> Either CustomError (String, IO String)
 procArgs [] = Left NoArgument
-procArgs [arg] = procOptions arg getContents
-procArgs [arg, file] = procOptions arg $ readFile file
+procArgs [arg] = Right (arg, getContents)
+procArgs [arg, file] = Right (arg, readFile file)
 procArgs _ = Left MoreArguments
 
 -- Main Function
 main :: IO ()
 main = do
-  -- Disable buffering
-  hSetBuffering stdout NoBuffering
-
   -- Load arguments
   args <- getArgs
 
-  -- Process program core functionality
-  case procArgs args of
-    Left err -> putStrLn ("An Error has occured!\nError code: " ++ show (codeToNumber err) ++ "\nError message: " ++ show err)
-    Right msg -> putStr (show msg)
+  -- Process arguments
+  case procOptions $ procArgs args of
+    Left err -> dumpError err ""
+    Right validArgs -> do
+      -- Parse input
+      inputStr <- snd validArgs
+      case parseCFG inputStr of
+        Left err -> dumpError ParseError (intercalate "" $ lines (show err))
+        -- Process action specified in argument
+        Right gram -> fst validArgs gram

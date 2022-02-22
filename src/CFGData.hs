@@ -2,11 +2,13 @@
 
 module CFGData where
 
-import Data.List (intercalate)
+import Lib (joinWithSep)
 
 type Symbol = Char
 
 type Symbols = [Symbol]
+
+type Rules = [Rule]
 
 data Rule = Rule
   { left :: Symbol,
@@ -16,19 +18,18 @@ data Rule = Rule
 instance Show Rule where
   show Rule {..} = [left] ++ "->" ++ right
 
-type Rules = [Rule]
-
-data ContextFreeGrammar = Gram
-  { terminals :: Symbols,
-    nonTerminals :: Symbols,
-    rules :: Rules,
-    startingSymbol :: Symbol
+data ContextFreeGrammar = CFG
+  { nonTerminals :: Symbols,
+    terminals :: Symbols,
+    startingSymbol :: Symbol,
+    rules :: Rules
   }
 
+-- Split each entity by lines
 instance Show ContextFreeGrammar where
-  show Gram {..} =
+  show CFG {..} =
     unlines $
-      [intercalate "," $ map (: []) nonTerminals]
-        ++ [intercalate "," $ map (: []) terminals]
+      [init (joinWithSep ',' nonTerminals)]
+        ++ [init (joinWithSep ',' terminals)]
         ++ [[startingSymbol]]
         ++ map show rules
