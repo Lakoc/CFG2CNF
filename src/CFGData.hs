@@ -11,12 +11,12 @@ type Symbols = [Symbol]
 type Rules = [Rule]
 
 data Rule = Rule
-  { left :: Symbol,
-    right :: [Symbol]
+  { _left :: Symbol,
+    _right :: [Symbol]
   }
 
 instance Show Rule where
-  show Rule {..} = [left] ++ "->" ++ right
+  show Rule {..} = [_left] ++ "->" ++ _right
 
 data ContextFreeGrammar = CFG
   { nonTerminals :: Symbols,
@@ -29,7 +29,7 @@ data ContextFreeGrammar = CFG
 instance Show ContextFreeGrammar where
   show CFG {..} =
     unlines $
-      [init (joinWithSep ',' nonTerminals)]
-        ++ [init (joinWithSep ',' terminals)]
+      [joinWithSep ',' nonTerminals]
+        ++ [joinWithSep ',' terminals]
         ++ [[startingSymbol]]
         ++ map show rules

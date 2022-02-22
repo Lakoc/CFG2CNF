@@ -1,7 +1,7 @@
 module Main where
 
 import CFGData (ContextFreeGrammar)
-import CFGParser (parseCFG)
+import CFGParser (parseCFG, validateCFG)
 import Data.List
 import Errors (CustomError (..), codeToNumber)
 import System.Environment (getArgs)
@@ -57,4 +57,6 @@ main = do
       case parseCFG inputStr of
         Left err -> dumpError ParseError (intercalate "" $ lines (show err))
         -- Process action specified in argument
-        Right gram -> fst validArgs gram
+        Right gram -> case validateCFG gram of
+              Left err -> dumpError err ""
+              Right validCFG -> fst validArgs validCFG
