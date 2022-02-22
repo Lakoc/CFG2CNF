@@ -1,7 +1,8 @@
 module Main where
 
 import CFGData (ContextFreeGrammar)
-import CFGParser (parseCFG, validateCFG)
+import CFGParser (parseCFG)
+import CFGFuncs (validateCFG, simplifyCFG)
 import Data.List
 import Errors (CustomError (..), codeToNumber)
 import System.Environment (getArgs)
@@ -11,9 +12,9 @@ dumpCFG :: ContextFreeGrammar -> IO ()
 dumpCFG cfg = do
   putStr (show cfg)
 
--- removeSimpleRules :: ContextFreeGrammar -> IO ()
--- removeSimpleRules bkg = do
---     putStrLn "Removing simple rules."
+removeSimpleRules :: ContextFreeGrammar -> IO ()
+removeSimpleRules cfg = do
+    dumpCFG $ simplifyCFG cfg
 
 -- dumpCNF :: ContextFreeGrammar -> IO ()
 -- dumpCNF bkg = do
@@ -31,7 +32,7 @@ procOptions val = case val of
   Left err -> Left err
   Right (arg, input) -> case arg of
     "-i" -> Right (dumpCFG, input)
-    "-1" -> Right (dumpCFG, input)
+    "-1" -> Right (removeSimpleRules, input)
     "-2" -> Right (dumpCFG, input)
     _ -> Left UnknownArgument
 
