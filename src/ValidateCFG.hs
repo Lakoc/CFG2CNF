@@ -12,6 +12,7 @@ validateCFG cfg@CFG {..} = if validGram then Right cfg else Left InvalidCFG
       startingSymbol `elem` nonTerminals -- startingSymbol is defined in nonTerminals
         && allUnique nonTerminals -- check if it's set
         && allUnique terminals -- check if it's set
+        && allUnique rules
         && all validRule rules
       where
         validRule Rule {..} =

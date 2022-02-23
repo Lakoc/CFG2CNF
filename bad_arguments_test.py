@@ -1,18 +1,23 @@
 import random
 import string
 from subprocess import Popen, PIPE
+import argparse
 
 if __name__ == '__main__':
-    args = ["",  # no arguments
-            "-i -i -i",  # multiple arguments
-            f"-i {''.join(random.choices(string.ascii_uppercase + string.digits, k=30))}",  # not existing file
-            "-i /tmp",  # folder
-            "-i -1",  # two valid args
-            "-i /dev/null"  # empty file
-            "-i "
-            ]
-    for arg in args:
-        cmd = ['./flp21-fun']
+    parser = argparse.ArgumentParser(description='Process argument tests of executable.')
+    parser.add_argument('executable', type=str, help="Executable path.")
+    args = parser.parse_args()
+
+    program_args = ["",  # no arguments
+                    "-i -i -i",  # multiple arguments
+                    f"-i {''.join(random.choices(string.ascii_uppercase + string.digits, k=30))}",  # not existing file
+                    "-i /tmp",  # folder
+                    "-i -1",  # two valid args
+                    "-i /dev/null"  # empty file
+                    "-i "
+                    ]
+    for arg in program_args:
+        cmd = [f'./{args.executable}']
         cmd.extend(arg.split())
 
         p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE,

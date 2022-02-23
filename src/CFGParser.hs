@@ -3,7 +3,18 @@ module CFGParser where
 import GrammarTypes (ContextFreeGrammar (CFG ), Rule (Rule), Rules, Symbols)
 import Data.Char (isLower, isUpper)
 import GHC.Base ()
-import Text.Parsec (ParseError, char, endBy, letter, many1, newline, parse, satisfy, sepBy1, string)
+import Text.Parsec
+    ( ParseError,
+      char,
+      endBy,
+      letter,
+      many1,
+      newline,
+      parse,
+      satisfy,
+      sepBy1,
+      string,
+      sepBy )
 import Text.Parsec.Combinator (eof)
 import Text.Parsec.String (Parser)
 
@@ -24,7 +35,7 @@ nonTerminalsP :: Parser Symbols
 nonTerminalsP = sepBy1 (satisfy isUpper) commaP
 
 terminalsP :: Parser Symbols
-terminalsP = sepBy1 (satisfy isLower) commaP
+terminalsP = sepBy (satisfy isLower) commaP
 
 rulesP :: Parser Rules
 rulesP = endBy ruleP newlineP
