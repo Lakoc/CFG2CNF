@@ -1,5 +1,3 @@
-module Main where
-
 import GrammarTypes (ContextFreeGrammar)
 import CFGParser (parseCFG)
 import ValidateCFG (validateCFG)
