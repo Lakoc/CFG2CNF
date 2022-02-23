@@ -1,8 +1,10 @@
 module Main where
 
-import CFGData (ContextFreeGrammar)
+import GrammarTypes (ContextFreeGrammar)
 import CFGParser (parseCFG)
-import CFGFuncs (validateCFG, simplifyCFG, convertToCNF)
+import ValidateCFG (validateCFG)
+import CFG2CNF (convertToCNF)
+import SimplifyCFG (simplifyCFG)
 import Data.List
 import Errors (CustomError (..), codeToNumber)
 import System.Environment (getArgs)

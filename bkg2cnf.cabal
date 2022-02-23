@@ -25,11 +25,13 @@ source-repository head
 
 library
   exposed-modules:
-      CFGData
-      CFGFuncs
+      CFG2CNF
       CFGParser
       Errors
+      GrammarTypes
       Lib
+      SimplifyCFG
+      ValidateCFG
   other-modules:
       Paths_bkg2cnf
   hs-source-dirs:

@@ -1,6 +1,6 @@
 module CFGParser where
 
-import CFGData (ContextFreeGrammar (CFG ), Rule (Rule), Rules, Symbols)
+import GrammarTypes (ContextFreeGrammar (CFG ), Rule (Rule), Rules, Symbols)
 import Data.Char (isLower, isUpper)
 import GHC.Base ()
 import Text.Parsec (ParseError, char, endBy, letter, many1, newline, parse, satisfy, sepBy1, string)

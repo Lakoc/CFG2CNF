@@ -1,6 +1,6 @@
 {-# LANGUAGE RecordWildCards #-}
 
-module CFGData where
+module GrammarTypes where
 
 import Lib (joinWithSep, joinWithSepStrings)
 
