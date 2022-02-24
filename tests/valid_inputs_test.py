@@ -38,5 +38,5 @@ if __name__ == '__main__':
             output, error = p.communicate()
             hyp_g = parse_grammar(output.decode("utf-8"))
             if not same_grammars(ref_g, hyp_g):
-                raise Exception(f"Test file: <{test}> failed.")
+                raise Exception(f"Test file: <{test}> failed.\n {output.decode('utf-8')}")
     print("All tests passed.")
