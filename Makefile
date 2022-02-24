@@ -17,9 +17,9 @@ $(ARCHIVE).zip: Makefile README.md Main.hs src/*.hs tests
 test: $(TARGET)
 	python tests/bad_arguments_test.py $^
 	python tests/errors_test.py $^ tests/errors
-	python tests/valid_inputs_test.py $^ tests/dumpCFG
-	python tests/valid_inputs_test.py $^ tests/simplifyCFG
-	python tests/valid_inputs_test.py $^ tests/CFG2CNF
+	python tests/valid_inputs_test.py $^ i tests/dumpCFG
+	python tests/valid_inputs_test.py $^ 1 tests/simplifyCFG
+	python tests/valid_inputs_test.py $^ 2 tests/CFG2CNF
 
 
 .PHONY: clean

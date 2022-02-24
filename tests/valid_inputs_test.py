@@ -22,6 +22,7 @@ def same_grammars(g1, g2):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Process tests in specified folder and compare to provided output.')
     parser.add_argument('executable', type=str, help="Executable path.")
+    parser.add_argument('argument', type=str, help="Program argument.")
     parser.add_argument('folder', type=str, help="Folder with tests.")
 
     args = parser.parse_args()
@@ -29,7 +30,7 @@ if __name__ == '__main__':
     tests = list(set([file.split('.')[0] for file in os.listdir(args.folder)]))
 
     for test in tests:
-        cmd = [f'./{args.executable}', '-i', f'{os.path.join(args.folder, test)}.in']
+        cmd = [f'./{args.executable}', f'-{args.argument}', f'{os.path.join(args.folder, test)}.in']
         p = Popen(cmd, stdin=PIPE, stdout=PIPE, stderr=PIPE,
                   bufsize=-1)
         with open(f'{os.path.join(args.folder, test)}.out') as f:
