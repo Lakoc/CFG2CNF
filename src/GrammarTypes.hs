@@ -50,6 +50,9 @@ data CNFRule = RuleN
 instance Show CNFRule where
   show RuleN {..} = _leftN ++ "->" ++ _rightN
 
+instance Eq CNFRule where
+  (RuleN left1 right1) == (RuleN left2 right2) = left1 == left2 && right1 == right2
+
 data ChomskyNormalForm = CNF
   { nonTerminalsN :: [Symbols],
     terminalsN :: Symbols,

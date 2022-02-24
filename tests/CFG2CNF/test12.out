@@ -1,0 +1,10 @@
+S,A,B,a',b',c',<bcAb>,<cAb>,<Ab>
+a,b,c
+S
+S->a'<bcAb>
+<bcAb>->b'<cAb>
+<cAb>->c'<Ab>
+<Ab>->Ab'
+b'->b
+c'->c
+a'->a

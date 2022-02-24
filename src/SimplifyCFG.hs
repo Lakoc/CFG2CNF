@@ -6,8 +6,9 @@ import GrammarTypes (Symbol, Rule(Rule, _left, _right), ContextFreeGrammar (CFG,
 import Data.Char (isUpper)
 
 -- Recursively generate not simple rules with specified nonTerminal on the left side
-generateApplicableRules :: Symbol -> [Rule] -> [Rule]
-generateApplicableRules nonTerminal rules
+generateApplicableRules :: Symbol -> [Rule] -> [Symbol] -> [Rule]
+generateApplicableRules nonTerminal rules processedNonTerminals
+  | nonTerminal `elem` processedNonTerminals = []
   | all complexRule nonTerminalOnLeft = nonTerminalOnLeft -- All rules with current nonTerminal are nonSimple
   | otherwise =
     foldr
@@ -15,7 +16,7 @@ generateApplicableRules nonTerminal rules
           acc ++ complexRulesSameLeft -- add all non simple rules
             ++ map
               (`replaceRuleLeft` nonTerminal) -- replace their left sides to get new rules
-              (generateApplicableRules derivableNonTerminal rules) -- get recursively complex rules derived from nonTerminals reachable by simple rule of the current nonTerminal
+              (generateApplicableRules derivableNonTerminal rules (nonTerminal:processedNonTerminals)) -- get recursively complex rules derived from nonTerminals reachable by simple rule of the current nonTerminal
       )
       []
       reachableNonTerminals
@@ -28,7 +29,7 @@ generateApplicableRules nonTerminal rules
 generateApplicableRulesAll :: [Symbol] -> [Rule] -> [Rule]
 generateApplicableRulesAll nonTerminals rules =
   foldr
-    (\nonTerminal acc -> acc ++ generateApplicableRules nonTerminal rules)
+    (\nonTerminal acc -> acc ++ generateApplicableRules nonTerminal rules [])
     []
     nonTerminals
 

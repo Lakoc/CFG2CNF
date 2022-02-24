@@ -14,7 +14,7 @@ convertToCNF CFG {..} =
     { terminalsN = terminals,
       nonTerminalsN = unique (map (: []) nonTerminals ++ filterEmptySublists (snd newRulesNonTerminals)), -- join old with new nonTerminals
       startingSymbolN = startingSymbol,
-      rulesN = fst newRulesNonTerminals -- generate new rules, that satisfy CNF condition
+      rulesN = unique (fst newRulesNonTerminals) -- generate new rules, that satisfy CNF condition
     }
   where
     newRulesNonTerminals = foldr (\rule acc -> joinTuples acc (convertRuleToCNF rule)) ([], [[]]) rules -- iterate over each rule and convert it to CNF
