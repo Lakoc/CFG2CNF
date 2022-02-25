@@ -1,3 +1,8 @@
+{-
+  Project: VUT FIT FLP BKG-2-CNF
+  Author: Alexander Polok <xpolok03@stud.fit.vutbr.cz>
+  Date: 25.2.2022
+-}
 {-# LANGUAGE RecordWildCards #-}
 
 module SimplifyCFG where

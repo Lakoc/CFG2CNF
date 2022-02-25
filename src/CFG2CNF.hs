@@ -1,10 +1,15 @@
+{-
+  Project: VUT FIT FLP BKG-2-CNF
+  Author: Alexander Polok <xpolok03@stud.fit.vutbr.cz>
+  Date: 25.2.2022
+-}
 {-# LANGUAGE RecordWildCards #-}
 
 module CFG2CNF where
 
-import GrammarTypes (CNFRule (RuleN, _leftN, _rightN), ChomskyNormalForm (CNF, nonTerminalsN, rulesN, startingSymbolN, terminalsN), ContextFreeGrammar (CFG, nonTerminals, rules, startingSymbol, terminals), Rule (Rule, _left, _right),  Symbols)
 import Data.Bifunctor (Bifunctor (bimap))
 import Data.Char (isLower, isUpper)
+import GrammarTypes (CNFRule (RuleN, _leftN, _rightN), ChomskyNormalForm (CNF, nonTerminalsN, rulesN, startingSymbolN, terminalsN), ContextFreeGrammar (CFG, nonTerminals, rules, startingSymbol, terminals), Rule (Rule, _left, _right), Symbols)
 import Lib (filterEmptySublists, unique)
 
 -- Convert CFG -> CNF
@@ -45,7 +50,8 @@ processMultipleSymbols rule@RuleN {..} =
       joinTuples
         ( if isLower (head _rightN)
             then -- terminal is first on the right side -> thus generate two new rules and new nonTerminal
-              ( [ RuleN {_leftN = _leftN, _rightN = [head _rightN] ++ "'<" ++ tail _rightN ++ ">"}, 
+
+              ( [ RuleN {_leftN = _leftN, _rightN = [head _rightN] ++ "'<" ++ tail _rightN ++ ">"},
                   RuleN {_leftN = head _rightN : "'", _rightN = [head _rightN]}
                 ],
                 (head _rightN : "'") : ["<" ++ tail _rightN ++ ">"] -- new nonTerminal

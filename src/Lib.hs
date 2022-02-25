@@ -1,3 +1,9 @@
+{-
+  Project: VUT FIT FLP BKG-2-CNF
+  Author: Alexander Polok <xpolok03@stud.fit.vutbr.cz>
+  Date: 25.2.2022
+-}
+
 module Lib where
 
 import Data.List (group, sort)
@@ -5,9 +11,9 @@ import Data.List (group, sort)
 safeInit :: [a] -> [a]
 safeInit [] = []
 safeInit [_] = []
-safeInit (x:xs) = x : safeInit xs
+safeInit (x : xs) = x : safeInit xs
 
--- Add to the list separator between every element 
+-- Add to the list separator between every element
 joinWithSep :: Foldable t => a -> t a -> [a]
 joinWithSep sep = safeInit . foldr (\x acc -> x : sep : acc) []
 
@@ -15,7 +21,7 @@ joinWithSepStrings :: Foldable t => a -> t [a] -> [a]
 joinWithSepStrings sep = safeInit . foldr (\x acc -> x ++ [sep] ++ acc) []
 
 filterEmptySublists :: Foldable t => [t a] -> [t a]
-filterEmptySublists lists = [ i | i <- lists, not (null i) ]
+filterEmptySublists lists = [i | i <- lists, not (null i)]
 
 -- Sort List and group by elements
 sg :: Ord a => [a] -> [[a]]
@@ -28,4 +34,4 @@ allUnique = all ((==) 1 . length) . sg
 -- Remove duplicates from list
 unique :: Eq a => [a] -> [a]
 unique [] = []
-unique (x:xs) = x:unique (filter (x /=) xs)
+unique (x : xs) = x : unique (filter (x /=) xs)

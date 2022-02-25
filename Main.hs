@@ -1,12 +1,18 @@
-import GrammarTypes (ContextFreeGrammar)
-import CFGParser (parseCFG)
-import ValidateCFG (validateCFG)
+{-
+  Project: VUT FIT FLP BKG-2-CNF
+  Author: Alexander Polok <xpolok03@stud.fit.vutbr.cz>
+  Date: 25.2.2022
+-}
+
 import CFG2CNF (convertToCNF)
-import SimplifyCFG (simplifyCFG)
+import CFGParser (parseCFG)
 import Data.List
 import Errors (CustomError (..), codeToNumber)
+import GrammarTypes (ContextFreeGrammar)
+import SimplifyCFG (simplifyCFG)
 import System.Environment (getArgs)
 import System.Exit
+import ValidateCFG (validateCFG)
 
 -- Program options
 dumpCFG :: ContextFreeGrammar -> IO ()
@@ -15,11 +21,11 @@ dumpCFG cfg = do
 
 removeSimpleRules :: ContextFreeGrammar -> IO ()
 removeSimpleRules cfg = do
-    dumpCFG $ simplifyCFG cfg
+  dumpCFG $ simplifyCFG cfg
 
 dumpCNF :: ContextFreeGrammar -> IO ()
 dumpCNF cfg = do
-    putStr (show $ convertToCNF ( simplifyCFG cfg))
+  putStr (show $ convertToCNF (simplifyCFG cfg))
 
 -- Print error message to stdout and exit with non-zero code
 dumpError :: CustomError -> String -> IO ()
@@ -60,5 +66,5 @@ main = do
         Left err -> dumpError ParseError (intercalate "" $ lines (show err))
         -- Process action specified in argument
         Right gram -> case validateCFG gram of
-              Left err -> dumpError err ""
-              Right validCFG -> fst validArgs validCFG
+          Left err -> dumpError err ""
+          Right validCFG -> fst validArgs validCFG

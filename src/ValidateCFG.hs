@@ -1,8 +1,15 @@
+{-
+  Project: VUT FIT FLP BKG-2-CNF
+  Author: Alexander Polok <xpolok03@stud.fit.vutbr.cz>
+  Date: 25.2.2022
+-}
 {-# LANGUAGE RecordWildCards #-}
+
 module ValidateCFG where
-import Errors ( CustomError(InvalidCFG) )
-import Lib ( allUnique )
-import GrammarTypes (ContextFreeGrammar (CFG, startingSymbol, nonTerminals, terminals, rules), Rule (Rule, _left, _right))
+
+import Errors (CustomError (InvalidCFG))
+import GrammarTypes (ContextFreeGrammar (CFG, nonTerminals, rules, startingSymbol, terminals), Rule (Rule, _left, _right))
+import Lib (allUnique)
 
 -- Validate context free grammar
 validateCFG :: ContextFreeGrammar -> Either CustomError ContextFreeGrammar
